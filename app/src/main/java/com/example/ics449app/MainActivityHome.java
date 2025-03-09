@@ -14,6 +14,17 @@ public class MainActivityHome extends AppCompatActivity{
     protected void onCreate(Bundle saveInstanceState)  {
         super.onCreate(saveInstanceState);
         getSupportActionBar().hide();
+
+        School newSchool = new School("123", "Central HighSchool", "0000 main Street", "contact@CentralHS.edu");
+        Student newUser = new Student("000111","John","Doe","johndoe@gmail.com","Password","Student","123");
+        Subject newSubject = new Subject("BIO-125","123");
+
+        SQLiteHelper dbHelper = SQLiteHelper.instanceOfDatabase(this);
+        dbHelper.addSchool(newSchool);
+
+        dbHelper.addStudent(newUser);
+        dbHelper.addSubject(newSubject);
+
         setContentView(R.layout.activity_main_home);
 
         // Find the button by ID
