@@ -28,9 +28,10 @@ public class DashboardActivity extends AppCompatActivity{
         btnLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public  void onClick(View view) {
-                Intent intent = new Intent(DashboardActivity.this, SignInActivity.class);
+                Intent intent = new Intent(DashboardActivity.this, MainActivityHome.class);
                 startActivity(intent);
                 finish();   // Close the dashboard activity
+
             }
         });
 

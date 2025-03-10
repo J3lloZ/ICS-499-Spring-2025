@@ -3,17 +3,17 @@ package com.example.ics449app;
 // Abstract class User
 public abstract class User {
     private String userID;
-    private String Fname;
-    private String Lname;
+    private String firstName;
+    private String lastName;
     private String email;
     private String password;
     private String role;
 
     // Constructor
-    public User(String userID, String Fname, String Lname, String email, String password, String role) {
+    public User(String userID, String firstName, String lastName, String email, String password, String role) {
         this.userID = userID;
-        this.Fname = Fname;
-        this.Lname = Lname;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
         this.role=role;
@@ -28,20 +28,20 @@ public abstract class User {
         this.userID = userID;
     }
 
-    public String getFname() {
-        return Fname;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFname(String Fname) {
-        this.Fname = Fname;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLname() {
-        return Lname;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLname(String Lname) {
-        this.Lname = Lname;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getEmail() {

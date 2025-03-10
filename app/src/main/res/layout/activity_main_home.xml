@@ -33,4 +33,18 @@
         app:backgroundTint="#E61C1C"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- Register Button -->
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="116dp"
+        android:layout_height="49dp"
+        android:layout_marginStart="236dp"
+        android:layout_marginTop="272dp"
+        android:text="Register"
+        app:backgroundTint="#E61C1C"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

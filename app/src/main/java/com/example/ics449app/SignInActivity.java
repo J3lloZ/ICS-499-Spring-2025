@@ -1,7 +1,6 @@
 package com.example.ics449app;
 
 import android.content.Intent;
-import android.health.connect.datatypes.ExerciseCompletionGoal;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,12 +11,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 public class SignInActivity extends AppCompatActivity {
+    private SQLiteHelper dbHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSupportActionBar().hide();
         setContentView(R.layout.sign_in_activity);
+
+        dbHelper = SQLiteHelper.instanceOfDatabase(this);   // initialize dbHelper
 
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
@@ -29,11 +31,11 @@ public class SignInActivity extends AppCompatActivity {
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
 
-                // Simple authentication check
-                if(email.equalsIgnoreCase("Admin@gmail.com") && password.equals("Password")) {
+                // Validate user with database
+                if(dbHelper.validateUser(email, password)) {
                     Toast.makeText(SignInActivity.this, "Login Successful!", Toast.LENGTH_SHORT).show();
 
-                    // Navigate to MainActivity
+                    // Navigate to Dashboard
                     Intent intent = new Intent(SignInActivity.this, DashboardActivity.class);
                     startActivity(intent);
                     finish();

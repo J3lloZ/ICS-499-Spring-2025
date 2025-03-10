@@ -4,8 +4,8 @@ public class Student extends User {
     private String schoolCode;
     private boolean isLocked;
 
-    public Student(String userID, String Fname, String Lname, String email, String password, String role, String schoolCode) {
-        super(userID, Fname, Lname, email, password, role);
+    public Student(String userID, String firstName, String lastName, String email, String password, String role, String schoolCode) {
+        super(userID, firstName, lastName, email, password, role);
         this.schoolCode=schoolCode;
     }
 
