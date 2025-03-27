@@ -37,7 +37,7 @@ public class MainActivityHome extends AppCompatActivity{
         // Sample Data
         School newSchool = new School("123", "Central HighSchool", "0000 main Street", "contact@CentralHS.edu");
         Student newUser = new Student("000111","John","Doe","johndoe@gmail.com","Password","Student","123");
-        Subject newSubject = new Subject("BIO-125","123");
+        Subject newSubject = new Subject("BIO-125","Biology","123");
 
         try {
             // Check if the school already exists

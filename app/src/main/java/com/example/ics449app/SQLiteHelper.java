@@ -7,74 +7,92 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 
-import java.security.spec.ECField;
-
 
 public class SQLiteHelper extends SQLiteOpenHelper {
-    private static final String DB_Name = "Study_DB";
-    private static final int DB_Version = 2;
-    private static SQLiteHelper instance;
+    private static SQLiteHelper sqLiteHelper;
+    private static final String DB_Name = "StudyDataBase";
+    private static final int DB_Version = 1;
 
-    // Table name and columns
-    private static final String TABLE_USERS = "users";
-    private static final String COLUMN_USER_ID = "userID";
-    private static final String COLUMN_FIRST_NAME = "firstName";
-    private static final String COLUMN_LAST_NAME = "lastName";
-    private static final String COLUMN_EMAIL = "email";
-    private static final String COLUMN_PASSWORD = "password";
-    private static final String COLUMN_ROLE = "role";
-    private static final String COLUMN_SCHOOL_CODE = "schoolCode";
 
-    // Create Table SQL query
-    private static final String TABLE_CREATE =
-            "CREATE TABLE " + TABLE_USERS + " (" +
-                    COLUMN_USER_ID + " TEXT PRIMARY KEY, " +
-                    COLUMN_FIRST_NAME + " TEXT, " +
-                    COLUMN_LAST_NAME + " TEXT, " +
-                    COLUMN_EMAIL + " TEXT, " +
-                    COLUMN_PASSWORD + " TEXT, " +
-                    COLUMN_ROLE + " TEXT, " +
-                    COLUMN_SCHOOL_CODE + " TEXT);";
+
+
     public SQLiteHelper(Context context) {
         super(context, DB_Name, null, DB_Version);
     }
-
-    // Singleton pattern
-    public static synchronized SQLiteHelper instanceOfDatabase(Context context) {
-        if (instance == null) {
-            instance = new SQLiteHelper(context.getApplicationContext());
+    public static SQLiteHelper instanceOfDatabase(Context context){
+        if(sqLiteHelper == null){
+            sqLiteHelper = new SQLiteHelper(context);
         }
-        return instance;
+        return sqLiteHelper;
     }
-
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(TABLE_CREATE);
+        String createSchoolsTable = "CREATE TABLE Schools (" +
+                "SchoolCode VARCHAR(255) PRIMARY KEY, " +
+                "name VARCHAR(255) NOT NULL, " +
+                "address VARCHAR(255), " +
+                "contact_email VARCHAR(255) UNIQUE);";
+        db.execSQL(createSchoolsTable);
+        String createSchoolusersSQL = "CREATE TABLE Users ("
+                + "userID VARCHAR(255) PRIMARY KEY, "
+                + "FirstName VARCHAR(255), "
+                + "LastName VARCHAR(255), "
+                + "email VARCHAR(255) UNIQUE, "
+                + "password VARCHAR(255), "
+                + "role VARCHAR(50), "
+                + "SchoolCode VARCHAR(255),"
+                + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode));";
+        db.execSQL(createSchoolusersSQL);
+        String createSubjectSQL = "CREATE TABLE subjects ("
+                + "SubjectID VARCHAR(255) PRIMARY KEY, "
+                + "SubjectName VARCHAR(255),"
+                + "SchoolCode VARCHAR(255) NOT NULL,"
+                + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode)"
+                + ");";
+        db.execSQL(createSubjectSQL);
+        String createClassesTable = "CREATE TABLE Classes ("
+                + "ClassID VARCHAR(255) PRIMARY KEY, "
+                + "SubjectID VARCHAR(255), "
+                + "teacherID VARCHAR(255), "
+                + "ClassName VARCHAR(255), "
+                + "TimeSlot VARCHAR(255), "
+                + "FOREIGN KEY (SubjectID) REFERENCES subjects(SubjectID), "
+                + "FOREIGN KEY (teacherID) REFERENCES Users(userID));";
+        db.execSQL(createClassesTable);
+        String createStudentClassesTable = "CREATE TABLE StudentClasses ("
+                + "StudentID VARCHAR(255) PRIMARY KEY, "
+                + "teacherID VARCHAR(255), "
+                + "FOREIGN KEY (StudentID) REFERENCES Users(userID), "
+                + "FOREIGN KEY (teacherID) REFERENCES Users(userID));";
+        db.execSQL(createStudentClassesTable);
+        String createParentsTable = "CREATE TABLE Parents ("
+                + "parentCode VARCHAR(255) PRIMARY KEY, "
+                + "firstName VARCHAR(255), "
+                + "lastName VARCHAR(255), "
+                + "contactEmail VARCHAR(255), "
+                + "ParentID VARCHAR(255), "
+                + "FOREIGN KEY (ParentID) REFERENCES Users(userID));";
+        //db.execSQL(createParentsTable);
+        String createParentChildTable = "CREATE TABLE ParentChild ("
+                + "ParentCode VARCHAR(255), "
+                + "ChildID VARCHAR(255), "
+                + "PRIMARY KEY (ParentCode, ChildID), "
+                + "FOREIGN KEY (ParentCode) REFERENCES Parents(parentCode), "
+                + "FOREIGN KEY (ChildID) REFERENCES Users(userID));";
+        //db.execSQL(createParentChildTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion < 2) {
-            // Add new columns to the users table if they don't exist already
-            try {
-                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_FIRST_NAME + " TEXT;");
-                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_LAST_NAME + " TEXT;");
-                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_EMAIL + " TEXT;");
-                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_PASSWORD + " TEXT;");
-                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_ROLE + " TEXT;");
-                db.execSQL("ALTER TABLE " + TABLE_USERS + " ADD COLUMN " + COLUMN_SCHOOL_CODE + " TEXT;");
-            } catch (Exception e) {
-                Log.e("SQLiteHelper", "Error adding columns: ", e);
-            }
-        }
-    }
 
+    }
     public void addSchool(School school) {
         SQLiteDatabase db = this.getWritableDatabase();
-        try {
+        try
+        {
             // SQL statement to insert a new school
             String insertSchoolQuery = "INSERT INTO Schools (SchoolCode, name, address, contact_email) " +
-                "VALUES (?,?, ?, ?)";
+                    "VALUES (?,?, ?, ?)";
 
             // Prepare the SQLite statement
             SQLiteStatement stmt = db.compileStatement(insertSchoolQuery);
@@ -85,20 +103,20 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
             // Execute the insert statement
             stmt.executeInsert();
+
         }catch (Exception e) {
             Log.e("SQLiteHelper", "Error adding school: ", e);
+        } finally {
+            // Always close the database connection to avoid memory leaks
+            db.close();
         }
-
     }
     public void addStudent(Student user) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            // Log user data
-            Log.d("SQLiteHelper", "Adding user: " + user.getUserID() + ", " + user.getFirstName() + " " + user.getLastName());
-
             // SQL statement to add a new user
-            String insertUserQuery = "INSERT INTO users (userID, firstName, lastName, email, password, role, SchoolCode) " +
-                        "VALUES (?, ?, ?, ?, ?, ?,?)";
+            String insertUserQuery = "INSERT INTO Users (userID, FirstName, LastName, email, password, role, SchoolCode) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
             // Prepare the SQLite statement
             SQLiteStatement stmt = db.compileStatement(insertUserQuery);
@@ -112,37 +130,45 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             stmt.bindString(6, user.getRole());
             stmt.bindString(7, user.getSchoolCode());
 
-
             // Execute the insert statement
             stmt.executeInsert();
-            Log.d("SQLiteHelper", "User added successfully");
+
+            Log.d("SQLiteHelper", "User added successfully: " + user.getUserID());
         } catch (Exception e) {
-            Log.e("SQLiteHelper", "Error adding student: ", e);
+            Log.e("SQLiteHelper", "Error adding user: ", e);
+        } finally {
+            // Always close the database connection to avoid memory leaks
+            db.close();
         }
     }
+
     public void addSubject(Subject subject) {
         SQLiteDatabase db = this.getWritableDatabase();
-        try {
+        try
+        {
+
 
             // SQL statement to insert a new subject
-            String insertSubjectQuery = "INSERT INTO subjects (SubjectID, SchoolCode) " +
-                    "VALUES (?, ?)";
+            String insertSubjectQuery = "INSERT INTO subjects (SubjectID, SubjectName, SchoolCode) " +
+                    "VALUES (?, ?, ?)";
 
             // Prepare the SQLite statement
             SQLiteStatement stmt = db.compileStatement(insertSubjectQuery);
 
             // Bind the subject data to the statement
             stmt.bindString(1, subject.getSubjectID());
-            stmt.bindString(2, subject.getSchoolCode());
+            stmt.bindString(2, subject.getSubjectName());
+            stmt.bindString(3, subject.getSchoolCode());
 
             // Execute the insert statement
             stmt.executeInsert();
         } catch (Exception e) {
-            Log.e("SQLiteHelper", "Error adding subject: ", e);
+            Log.e("SQLiteHelper", "Error adding school: ", e);
+        } finally {
+            // Always close the database connection to avoid memory leaks
+            db.close();
         }
     }
-
-    // Check if User exist method
     public boolean validateUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
@@ -214,7 +240,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             return false;
         } finally {
             if (cursor != null) {
-            cursor.close();
+                cursor.close();
             }
 
         }
