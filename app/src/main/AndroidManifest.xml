@@ -26,6 +26,7 @@
         <!-- Student & Parent Dashboards -->
         <activity android:name=".StudentDashboardActivity" android:exported="true" />
         <activity android:name=".ParentDashboardActivity" android:exported="true" />
+        <activity android:name=".TeacherDashboardActivity" android:exported="true" />
 
         <!-- Old Dashboard (Remove if not needed) -->
         <activity android:name=".DashboardActivity" android:exported="false" />
