@@ -2,22 +2,21 @@ package com.example.ics449app;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.service.controls.templates.ToggleTemplate;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.UUID;
 
-public class RegisterActivity extends AppCompatActivity{
+public class RegisterActivity extends AppCompatActivity {
     private SQLiteHelper dbHelper;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)  {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_activity);
 
@@ -30,51 +29,51 @@ public class RegisterActivity extends AppCompatActivity{
         EditText etEmail = findViewById(R.id.etEmail);
         EditText etPassword = findViewById(R.id.etPassword);
         EditText etSchoolCode = findViewById(R.id.etSchoolCode);
+        Spinner spinnerRole = findViewById(R.id.spinnerRole);  // New spinner
         Button btnRegister = findViewById(R.id.btnRegister);
 
-        // Set up the register button click Listener
-        btnRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String firstName = etFirstName.getText().toString().trim();
-                String lastName = etLastName.getText().toString().trim();
-                String email = etEmail.getText().toString().trim();
-                String password = etPassword.getText().toString().trim();
-                String schoolCode = etSchoolCode.getText().toString().trim();
+        // Set up the register button click listener
+        btnRegister.setOnClickListener(view -> {
+            String firstName = etFirstName.getText().toString().trim();
+            String lastName = etLastName.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+            String schoolCode = etSchoolCode.getText().toString().trim();
+            String selectedRole = spinnerRole.getSelectedItem().toString().trim(); // Get role
 
-                // Validate User input
-                if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty() || schoolCode.isEmpty()) {
-                    Toast.makeText(RegisterActivity.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+            // Validate user input
+            if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() ||
+                    password.isEmpty() || schoolCode.isEmpty() || selectedRole.equals("Select Role")) {
+                Toast.makeText(RegisterActivity.this, "Please fill in all fields and select a valid role", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                // Check if email already exists
-                if (dbHelper.userExists(email)) {
-                    Toast.makeText(RegisterActivity.this, "User already exists", Toast.LENGTH_SHORT).show();
-                    return;
-                }
 
-                // Generate a unique userID
-                String userID = UUID.randomUUID().toString();
+            // Check if user already exists
+            if (dbHelper.userExists(email)) {
+                Toast.makeText(RegisterActivity.this, "User already exists", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-                // Create a new student object
-                Student newUser = new Student(userID, firstName, lastName, email, password, "Student", schoolCode);
+            // Generate a unique userID
+            String userID = UUID.randomUUID().toString();
 
-                try {
-                    // Add the user to the database
-                    dbHelper.addStudent(newUser);
+            // Create a new student/parent/teacher user
+            Student newUser = new Student(userID, firstName, lastName, email, password, selectedRole, schoolCode);
 
-                    // Display success message
-                    Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+            try {
+                // Add the user to the database
+                dbHelper.addStudent(newUser);
 
-                    // Navigate to Dashboard
-                    Intent intent = new Intent(RegisterActivity.this, DashboardActivity.class);
-                    startActivity(intent);
-                    finish();
-                } catch (Exception e) {
-                    Log.e("RegisterActivity", "Error adding user to database", e);
-                    Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+
+                // Navigate to login screen after registration
+                Intent intent = new Intent(RegisterActivity.this, SignInActivity.class);
+                startActivity(intent);
+                finish();
+            } catch (Exception e) {
+                Log.e("RegisterActivity", "Error adding user to database", e);
+                Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

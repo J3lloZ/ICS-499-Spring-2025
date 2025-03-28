@@ -12,26 +12,25 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ICS449App"
         tools:targetApi="31">
-        <activity
-            android:name=".SignInActivity"
-            android:exported="false" />
-        <activity
-            android:name="DashboardActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false" />
-        <activity
-            android:name=".MainActivityHome"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.ICS449App">
+
+        <!-- Sign In & Registration Activities -->
+        <activity android:name=".SignInActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity android:name=".RegisterActivity" android:exported="true" />
+
+        <!-- Student & Parent Dashboards -->
+        <activity android:name=".StudentDashboardActivity" android:exported="true" />
+        <activity android:name=".ParentDashboardActivity" android:exported="true" />
+
+        <!-- Old Dashboard (Remove if not needed) -->
+        <activity android:name=".DashboardActivity" android:exported="false" />
+
     </application>
 
 </manifest>
+
