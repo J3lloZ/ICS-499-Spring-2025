@@ -39,9 +39,14 @@ public class SignInActivity extends AppCompatActivity {
                     cursor.close();
 
                     if ("student".equalsIgnoreCase(role)) {
-                        startActivity(new Intent(this, StudentDashboardActivity.class));
+                        Intent intent = new Intent(SignInActivity.this, StudentDashboardActivity.class);
+                        startActivity(intent);
                     } else if ("parent".equalsIgnoreCase(role)) {
-                        startActivity(new Intent(this, ParentDashboardActivity.class));
+                        Intent intent = new Intent(SignInActivity.this, ParentDashboardActivity.class);
+                        startActivity(intent);
+                    } else if ("teacher".equalsIgnoreCase(role)) {
+                        Intent intent = new Intent(SignInActivity.this, TeacherDashboardActivity.class);
+                        startActivity(intent);
                     } else {
                         Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
                     }
