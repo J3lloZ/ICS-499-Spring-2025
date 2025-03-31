@@ -3,11 +3,11 @@ package com.example.ics449app;
 public class Subject {
     private String SubjectID;
     private String schoolCode;
-    private Subject[] subjectList;
-    Subject(String SubjectID, String schoolCode){
+    private String SubjectName;
+    Subject(String SubjectID, String SubjectName, String schoolCode){
         this.SubjectID=SubjectID;
         this.schoolCode=schoolCode;
-
+        this.SubjectName=SubjectName;
     }
 
     public String getSubjectID() {
@@ -26,11 +26,11 @@ public class Subject {
         schoolCode = SchoolCode;
     }
 
-    public Subject[] getSubjectList() {
-        return subjectList;
+    public String getSubjectName() {
+        return SubjectName;
     }
 
-    public void setSubjectList(Subject[] subjectList) {
-        this.subjectList = subjectList;
+    public void setSubjectName(String subjectName) {
+        SubjectName = subjectName;
     }
 }
