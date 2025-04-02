@@ -8,6 +8,7 @@
         <item>Parent</item>
         <item>Teacher</item>
     </string-array>
+    <string name="teacher_dashboard">Teacher Dashboard</string>
 
 
 </resources>

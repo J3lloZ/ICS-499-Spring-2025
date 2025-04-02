@@ -6,6 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
+import java.util.List;
+
+import java.util.ArrayList;
 
 
 public class SQLiteHelper extends SQLiteOpenHelper {
@@ -173,8 +176,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
         try {
-            String query = "SELECT * FROM Users WHERE email = ? AND password = ?";
-            cursor = db.rawQuery(query, new String[]{email, password});
+            String query = "SELECT * FROM Users WHERE LOWER(email) = LOWER(?) AND password = ?";
+            cursor = db.rawQuery(query, new String[]{email.toLowerCase(), password});
 
             return cursor.moveToFirst();
         } catch (Exception e) {
@@ -246,4 +249,30 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
     }
 
+    // Search for Student
+    public List<Student> getStudentsBySchool(String schoolCode) {
+        List<Student> students = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM Users WHERE role = 'Student' AND SchoolCode = ?", new String[]{schoolCode});
+
+        if (cursor.moveToFirst())   {
+            do {
+                String studentID = cursor.getString(0);
+                String firstName = cursor.getString(1);
+                String lastName = cursor.getString(2);
+                String email = cursor.getString(3);
+                String password = cursor.getString(4);
+                String school = cursor.getString(5);
+
+                students.add(new Student(studentID, firstName, lastName, email, password, "Student", school));
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return students;
+    }
+
+    public boolean addStudentToClass(String email, String teacherSchoolCode) {
+        return true;
+    }
 }

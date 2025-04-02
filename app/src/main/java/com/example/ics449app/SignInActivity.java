@@ -32,10 +32,11 @@ public class SignInActivity extends AppCompatActivity {
 
             if (dbHelper.validateUser(email, password)) {
                 SQLiteDatabase readableDb = dbHelper.getReadableDatabase();
-                Cursor cursor = readableDb.rawQuery("SELECT role FROM users WHERE email = ?", new String[]{email});
+                Cursor cursor = readableDb.rawQuery("SELECT role, schoolCode FROM users WHERE LOWER(email) = LOWER(?)", new String[]{email});
 
                 if (cursor.moveToFirst()) {
                     String role = cursor.getString(0);
+                    String schoolCode = cursor.getString(1);
                     cursor.close();
 
                     if ("student".equalsIgnoreCase(role)) {
@@ -46,6 +47,8 @@ public class SignInActivity extends AppCompatActivity {
                         startActivity(intent);
                     } else if ("teacher".equalsIgnoreCase(role)) {
                         Intent intent = new Intent(SignInActivity.this, TeacherDashboardActivity.class);
+                        intent.putExtra("email", email);
+                        intent.putExtra("schoolCode", schoolCode);
                         startActivity(intent);
                     } else {
                         Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
