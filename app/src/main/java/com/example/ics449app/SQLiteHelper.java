@@ -6,9 +6,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
-import java.util.List;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class SQLiteHelper extends SQLiteOpenHelper {
@@ -75,7 +75,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 + "contactEmail VARCHAR(255), "
                 + "ParentID VARCHAR(255), "
                 + "FOREIGN KEY (ParentID) REFERENCES Users(userID));";
-        //db.execSQL(createParentsTable);
+        db.execSQL(createParentsTable);
         String createParentChildTable = "CREATE TABLE ParentChild ("
                 + "ParentCode VARCHAR(255), "
                 + "ChildID VARCHAR(255), "
@@ -176,8 +176,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = null;
         try {
-            String query = "SELECT * FROM Users WHERE LOWER(email) = LOWER(?) AND password = ?";
-            cursor = db.rawQuery(query, new String[]{email.toLowerCase(), password});
+            String query = "SELECT * FROM Users WHERE email = ? AND password = ?";
+            cursor = db.rawQuery(query, new String[]{email, password});
 
             return cursor.moveToFirst();
         } catch (Exception e) {
@@ -248,8 +248,6 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
         }
     }
-
-    // Search for Student
     public List<Student> getStudentsBySchool(String schoolCode) {
         List<Student> students = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
