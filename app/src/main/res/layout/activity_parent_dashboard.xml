@@ -6,6 +6,17 @@
     android:gravity="center"
     android:padding="20dp">
 
+    <!-- Welcome message -->
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome!"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:layout_gravity="center_horizontal"/>
+
     <TextView
         android:id="@+id/tvSelectChild"
         android:layout_width="wrap_content"
