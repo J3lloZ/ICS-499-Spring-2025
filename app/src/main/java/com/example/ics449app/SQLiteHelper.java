@@ -1,5 +1,6 @@
 package com.example.ics449app;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -14,9 +15,7 @@ import java.util.ArrayList;
 public class SQLiteHelper extends SQLiteOpenHelper {
     private static SQLiteHelper sqLiteHelper;
     private static final String DB_Name = "StudyDataBase";
-    private static final int DB_Version = 1;
-
-
+    private static final int DB_Version = 2;
 
 
     public SQLiteHelper(Context context) {
@@ -30,12 +29,15 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // School table
         String createSchoolsTable = "CREATE TABLE Schools (" +
                 "SchoolCode VARCHAR(255) PRIMARY KEY, " +
                 "name VARCHAR(255) NOT NULL, " +
                 "address VARCHAR(255), " +
                 "contact_email VARCHAR(255) UNIQUE);";
         db.execSQL(createSchoolsTable);
+
+        // User table
         String createSchoolusersSQL = "CREATE TABLE Users ("
                 + "userID VARCHAR(255) PRIMARY KEY, "
                 + "FirstName VARCHAR(255), "
@@ -46,6 +48,42 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 + "SchoolCode VARCHAR(255),"
                 + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode));";
         db.execSQL(createSchoolusersSQL);
+
+        // Teacher table
+        String createTeacherSQL = "CREATE TABLE Teacher ("
+                + "TeacherID VARCHAR(255) PRIMARY KEY, "
+                + "userID VARCHAR(255),"
+
+                + "FirstName VARCHAR(255), "
+                + "LastName VARCHAR(255), "
+                + "SchoolCode VARCHAR(255),"
+                + "FOREIGN KEY (userID) REFERENCES Users(userID), "
+                + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode));";
+        db.execSQL(createTeacherSQL);
+
+        // Parent table
+        String createParentSQL = "CREATE TABLE Parent ("
+                + "ParentID VARCHAR(255) PRIMARY KEY, "
+                + "userID VARCHAR(255),"
+                + "FirstName VARCHAR(255), "
+                + "LastName VARCHAR(255), "
+                + "SchoolCode VARCHAR(255),"
+                + "FOREIGN KEY (userID) REFERENCES Users(userID), "
+                + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode));";
+        db.execSQL(createParentSQL);
+
+        // Student table
+        String createStudentSQL = "CREATE TABLE Student ("
+                + "StudentID VARCHAR(255) PRIMARY KEY, "
+                + "userID VARCHAR(255),"
+                + "FirstName VARCHAR(255), "
+                + "LastName VARCHAR(255), "
+                + "SchoolCode VARCHAR(255),"
+                + "FOREIGN KEY (userID) REFERENCES Users(userID),"
+                + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode));";
+        db.execSQL(createStudentSQL);
+
+        // Subject table
         String createSubjectSQL = "CREATE TABLE subjects ("
                 + "SubjectID VARCHAR(255) PRIMARY KEY, "
                 + "SubjectName VARCHAR(255),"
@@ -53,6 +91,8 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 + "FOREIGN KEY (SchoolCode) REFERENCES Schools(SchoolCode)"
                 + ");";
         db.execSQL(createSubjectSQL);
+
+        // Classes table
         String createClassesTable = "CREATE TABLE Classes ("
                 + "ClassID VARCHAR(255) PRIMARY KEY, "
                 + "SubjectID VARCHAR(255), "
@@ -60,34 +100,27 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 + "ClassName VARCHAR(255), "
                 + "TimeSlot VARCHAR(255), "
                 + "FOREIGN KEY (SubjectID) REFERENCES subjects(SubjectID), "
-                + "FOREIGN KEY (teacherID) REFERENCES Users(userID));";
+                + "FOREIGN KEY (teacherID) REFERENCES Teacher(teacherID));";
         db.execSQL(createClassesTable);
+
+        // StudentClasses table
         String createStudentClassesTable = "CREATE TABLE StudentClasses ("
-                + "StudentID VARCHAR(255) PRIMARY KEY, "
+                + "StudentID VARCHAR(255), "
                 + "teacherID VARCHAR(255), "
+                + "PRIMARY KEY (StudentID, teacherID), "
                 + "FOREIGN KEY (StudentID) REFERENCES Users(userID), "
                 + "FOREIGN KEY (teacherID) REFERENCES Users(userID));";
         db.execSQL(createStudentClassesTable);
-        String createParentsTable = "CREATE TABLE Parents ("
-                + "parentCode VARCHAR(255) PRIMARY KEY, "
-                + "firstName VARCHAR(255), "
-                + "lastName VARCHAR(255), "
-                + "contactEmail VARCHAR(255), "
-                + "ParentID VARCHAR(255), "
-                + "FOREIGN KEY (ParentID) REFERENCES Users(userID));";
-        //db.execSQL(createParentsTable);
-        String createParentChildTable = "CREATE TABLE ParentChild ("
-                + "ParentCode VARCHAR(255), "
-                + "ChildID VARCHAR(255), "
-                + "PRIMARY KEY (ParentCode, ChildID), "
-                + "FOREIGN KEY (ParentCode) REFERENCES Parents(parentCode), "
-                + "FOREIGN KEY (ChildID) REFERENCES Users(userID));";
-        //db.execSQL(createParentChildTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+        if (oldVersion < newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS Teacher");
+            db.execSQL("DROP TABLE IF EXISTS Parent");
+            db.execSQL("DROP TABLE IF EXISTS Student");
+            onCreate(db);
+        }
     }
     public void addSchool(School school) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -100,7 +133,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             // Prepare the SQLite statement
             SQLiteStatement stmt = db.compileStatement(insertSchoolQuery);
             stmt.bindString(1, school.getSchoolCode());
-            stmt.bindString(2, school.getSchoolname());
+            stmt.bindString(2, school.getSchoolName());
             stmt.bindString(3, school.getAddress());
             stmt.bindString(4, school.getContact_email());
 
@@ -114,33 +147,96 @@ public class SQLiteHelper extends SQLiteOpenHelper {
             db.close();
         }
     }
-    public void addStudent(Student user) {
+    public void addUser(Teacher teacher) {
         SQLiteDatabase db = this.getWritableDatabase();
         try {
-            // SQL statement to add a new user
-            String insertUserQuery = "INSERT INTO Users (userID, FirstName, LastName, email, password, role, SchoolCode) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-            // Prepare the SQLite statement
-            SQLiteStatement stmt = db.compileStatement(insertUserQuery);
-
-            // Bind the user data to the statement
-            stmt.bindString(1, user.getUserID());
-            stmt.bindString(2, user.getFirstName());
-            stmt.bindString(3, user.getLastName());
-            stmt.bindString(4, user.getEmail());
-            stmt.bindString(5, user.getPassword());
-            stmt.bindString(6, user.getRole());
-            stmt.bindString(7, user.getSchoolCode());
-
-            // Execute the insert statement
+            // Insert into Users table
+            String insertQuery = "INSERT INTO Users (userID, FirstName, LastName, email, password, role, SchoolCode) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            SQLiteStatement stmt = db.compileStatement(insertQuery);
+            stmt.bindString(1, teacher.getUserID());
+            stmt.bindString(2, teacher.getFirstName());
+            stmt.bindString(3, teacher.getLastName());
+            stmt.bindString(4, teacher.getEmail());
+            stmt.bindString(5, teacher.getPassword());
+            stmt.bindString(6, "Teacher");
+            stmt.bindString(7, teacher.getSchoolCode());
             stmt.executeInsert();
 
-            Log.d("SQLiteHelper", "User added successfully: " + user.getUserID());
+            // Insert into Teacher table
+            String insertTeacherQuery = "INSERT INTO Teacher (TeacherID, userID, FirstName, LastName, SchoolCode) VALUES (?, ?, ?, ?, ?)";
+            SQLiteStatement stmtTeacher = db.compileStatement(insertTeacherQuery);
+            stmtTeacher.bindString(1, teacher.getTeacherId());
+            stmtTeacher.bindString(2, teacher.getUserID());
+            stmtTeacher.bindString(3, teacher.getFirstName());
+            stmtTeacher.bindString(4, teacher.getLastName());
+            stmtTeacher.bindString(5, teacher.getSchoolCode());
+            stmtTeacher.executeInsert();
+
         } catch (Exception e) {
-            Log.e("SQLiteHelper", "Error adding user: ", e);
+            Log.e("SQLiteHelper", "Error adding Teacher", e);
         } finally {
-            // Always close the database connection to avoid memory leaks
+            db.close();
+        }
+    }
+
+    public void addUser(Student student) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Insert into Users table
+            String insertQuery = "INSERT INTO Users (userID, FirstName, LastName, email, password, role, SchoolCode) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            SQLiteStatement stmt = db.compileStatement(insertQuery);
+            stmt.bindString(1, student.getUserID());
+            stmt.bindString(2, student.getFirstName());
+            stmt.bindString(3, student.getLastName());
+            stmt.bindString(4, student.getEmail());
+            stmt.bindString(5, student.getPassword());
+            stmt.bindString(6, "Student");
+            stmt.bindString(7, student.getSchoolCode());
+            stmt.executeInsert();
+
+            // Insert into Student table
+            String insertTeacherQuery = "INSERT INTO Student (StudentID, userID, FirstName, LastName, SchoolCode) VALUES (?, ?, ?, ?, ?)";
+            SQLiteStatement stmtStudent = db.compileStatement(insertTeacherQuery);
+            stmtStudent.bindString(1, student.getStudentId());
+            stmtStudent.bindString(2, student.getUserID());
+            stmtStudent.bindString(3, student.getFirstName());
+            stmtStudent.bindString(4, student.getLastName());
+            stmtStudent.bindString(5, student.getSchoolCode());
+            stmtStudent.executeInsert();
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error adding Student", e);
+        } finally {
+            db.close();
+        }
+    }
+
+    public void addUser(Parent parent) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        try {
+            // Insert into Users table
+            String insertQuery = "INSERT INTO Users (userID, FirstName, LastName, email, password, role, SchoolCode) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            SQLiteStatement stmt = db.compileStatement(insertQuery);
+            stmt.bindString(1, parent.getUserID());
+            stmt.bindString(2, parent.getFirstName());
+            stmt.bindString(3, parent.getLastName());
+            stmt.bindString(4, parent.getEmail());
+            stmt.bindString(5, parent.getPassword());
+            stmt.bindString(6, "Parent");
+            stmt.bindString(7, parent.getSchoolCode());
+            stmt.executeInsert();
+
+            // Insert into Parent table
+            String insertTeacherQuery = "INSERT INTO Parent (ParentID, userID, FirstName, LastName, SchoolCode) VALUES (?, ?, ?, ?, ?)";
+            SQLiteStatement stmtParent = db.compileStatement(insertTeacherQuery);
+            stmtParent.bindString(1, parent.getParentId());
+            stmtParent.bindString(2, parent.getUserID());
+            stmtParent.bindString(3, parent.getFirstName());
+            stmtParent.bindString(4, parent.getLastName());
+            stmtParent.bindString(5, parent.getSchoolCode());
+            stmtParent.executeInsert();
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error adding Parent", e);
+        } finally {
             db.close();
         }
     }
@@ -174,6 +270,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
     public boolean validateUser(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
+
         Cursor cursor = null;
         try {
             String query = "SELECT * FROM Users WHERE LOWER(email) = LOWER(?) AND password = ?";
@@ -273,6 +370,43 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     }
 
     public boolean addStudentToClass(String email, String teacherSchoolCode) {
-        return true;
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        // Get student ID by email
+        String studentIdQuery = "SELECT StudentID FROM Student Where email = ?";
+        Cursor cursor = db.rawQuery(studentIdQuery, new String[] {email});
+
+        if (cursor.moveToFirst()) {
+            int studentIdColumnIndex = cursor.getColumnIndex("StudentID");
+
+            // Ensure column index is valid
+            if (studentIdColumnIndex >= 0) {
+                String studentId = cursor.getString(studentIdColumnIndex);  // Safely access the student ID
+                cursor.close();
+
+                // Get teacher id by school code
+                String classIdQuery = "SELECT TeacherID FROM StudentClasses WHERE SchoolCode = ?";
+                cursor = db.rawQuery(classIdQuery, new String[]{teacherSchoolCode});
+
+                if (cursor.moveToFirst()) {
+                    int classIdColumnIndex = cursor.getColumnIndex("TeacherID");
+
+                    // Ensure column index is valid
+                    if (classIdColumnIndex >= 0) {
+                        String teacherID = cursor.getString(classIdColumnIndex);
+                        cursor.close();
+
+                        // Insert into student classes table to link student with teacher
+                        ContentValues values = new ContentValues();
+                        values.put("StudentID", studentId);
+                        values.put("TeacherID", teacherSchoolCode);
+
+                        long result = db.insert("StudentClasses", null, values);
+                        return result != -1;    // Return true if insertion was successful
+                    }
+                }
+            }
+        }
+        return false;   // Return false if any query fails or if column index is invalid
     }
 }

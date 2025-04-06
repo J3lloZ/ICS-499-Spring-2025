@@ -2,13 +2,13 @@ package com.example.ics449app;
 
 public class School {
     private String schoolCode;
-    private String Schoolname;
+    private String SchoolName;
     private String address;
     private String contact_email;
 
-    School(String SchoolCode, String schoolname,String address,String contact_email){
+    School(String SchoolCode, String schoolName,String address,String contact_email){
         this.schoolCode=SchoolCode;
-        this.Schoolname=schoolname;
+        this.SchoolName=schoolName;
         this.address=address;
         this.contact_email=contact_email;
     }
@@ -21,12 +21,12 @@ public class School {
         schoolCode = SchoolCode;
     }
 
-    public String getSchoolname() {
-        return Schoolname;
+    public String getSchoolName() {
+        return SchoolName;
     }
 
-    public void setSchoolname(String schoolname) {
-        Schoolname = schoolname;
+    public void setSchoolName(String schoolName) {
+        SchoolName = schoolName;
     }
 
     public String getAddress() {

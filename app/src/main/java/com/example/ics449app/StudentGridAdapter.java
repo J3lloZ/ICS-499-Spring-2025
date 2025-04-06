@@ -11,12 +11,10 @@ import java.util.List;
 public class StudentGridAdapter extends BaseAdapter {
     private Context context;
     private List<Student> selectedStudents;
-    private LayoutInflater inflater;
 
     public StudentGridAdapter(Context context, List<Student> selectedStudents) {
         this.context = context;
         this.selectedStudents = selectedStudents;
-        this.inflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -36,13 +34,18 @@ public class StudentGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        // Inflate the view and set the data (e.g., student name)
+        // Ensure this is correctly showing the student in the grid
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.grid_item_student, parent, false);
+            convertView = LayoutInflater.from(context).inflate(R.layout.grid_item_student, parent, false);
         }
 
-        TextView studentName = convertView.findViewById(R.id.studentName);
+        // Get the student for this position
         Student student = selectedStudents.get(position);
-        studentName.setText(student.getFirstName() + " " + student.getLastName());
+
+        // Get the TextView from the layout and set the student name
+        TextView textView = convertView.findViewById(R.id.studentName);
+        textView.setText(student.getFirstName() + " " + student.getLastName());
 
         return convertView;
     }

@@ -8,15 +8,17 @@ public abstract class User {
     private String email;
     private String password;
     private String role;
+    private String schoolCode;
 
     // Constructor
-    public User(String userID, String firstName, String lastName, String email, String password, String role) {
+    public User(String userID, String firstName, String lastName, String email, String password, String role, String schoolCode) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.password = password;
-        this.role=role;
+        this.role = role;
+        this.schoolCode = schoolCode;
     }
 
     // Getters and Setters
@@ -66,5 +68,13 @@ public abstract class User {
 
     public void setRole(String schoolCode) {
         this.role = role;
+    }
+
+    public String getSchoolCode() {
+        return schoolCode;
+    }
+
+    public void setSchoolCode() {
+        this.schoolCode = schoolCode;
     }
 }

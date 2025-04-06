@@ -36,7 +36,7 @@ public class MainActivityHome extends AppCompatActivity{
 
         // Sample Data
         School newSchool = new School("123", "Central HighSchool", "0000 main Street", "contact@CentralHS.edu");
-        Student newUser = new Student("000111","John","Doe","johndoe@gmail.com","Password","Student","123");
+        Student newUser = new Student("000111", "S001", "John","Doe","johndoe@gmail.com","Password","Student","123");
         Subject newSubject = new Subject("BIO-125","Biology","123");
 
         try {
@@ -49,7 +49,7 @@ public class MainActivityHome extends AppCompatActivity{
 
             // Check if the user already exists
             if (!dbHelper.userExists(newUser.getUserID())) {
-                dbHelper.addStudent(newUser);
+                dbHelper.addUser(newUser);
             } else {
                 Log.d("DB", "School already exists");
             }

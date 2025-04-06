@@ -28,7 +28,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private StudentGridAdapter selectedStudentsAdapter;
     private String teacherSchoolCode;
     private Button btnAddStudent, btnLockStudent;
-    private Student lastSelectedStudent;
+
 
 
     @Override
@@ -51,12 +51,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         Intent intent = getIntent();
         teacherSchoolCode = intent.getStringExtra("schoolCode");    // Passed from login
 
-        if(teacherSchoolCode == null){
-            Log.e("TeacherDashboard", "No schoolCode received");
-        }else {
-            Log.e("TeacherDashboard", "schoolCode received " + teacherSchoolCode);
-        }
-
         // Load students from the same school
         loadStudents();
 
@@ -66,10 +60,19 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
         // Handle student selection
         studentListView.setOnItemClickListener((parent, view, position, id) -> {
-            Student selectedStudent = students.get(position);
-            if(!selectedStudents.contains(selectedStudent)) {
-                selectedStudents.add(selectedStudent);
-                selectedStudentsAdapter.notifyDataSetChanged();
+            // Get student from filter list
+            String selectedName = (String) parent.getItemAtPosition(position);
+
+            for (Student student : students) {
+                String fullName = student.getFirstName() + " " + student.getLastName();
+                if (fullName.equals(selectedName)) {
+                    if (!selectedStudents.contains(student)) {
+                        selectedStudents.add(student);
+                        selectedStudentsAdapter.notifyDataSetChanged();
+                        selectedStudentsGrid.setVisibility(View.VISIBLE);
+                    }
+                    break;
+                }
             }
         });
 
@@ -102,11 +105,12 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextChange(String newText) {
                 if(newText.isEmpty()) {
-                    studentListView.setVisibility(View.GONE);
+                    studentListView.setVisibility(View.GONE);   // Hide list when search is empty
                 } else {
-                    studentListView.setVisibility(View.VISIBLE);
+                    studentListView.setVisibility(View.VISIBLE);    // Hide list if search is empty
                     studentAdapter.getFilter().filter(newText);
                 }
+                selectedStudentsAdapter.notifyDataSetChanged(); // Update grid after search
                 return false;
             }
         });

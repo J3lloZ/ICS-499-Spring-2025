@@ -58,19 +58,47 @@ public class RegisterActivity extends AppCompatActivity {
             // Generate a unique userID
             String userID = UUID.randomUUID().toString();
 
-            // Create a new student/parent/teacher user
-            Student newUser = new Student(userID, firstName, lastName, email, password, selectedRole, schoolCode);
+            User newUser = null;
 
             try {
-                // Add the user to the database
-                dbHelper.addStudent(newUser);
+                if(selectedRole.equalsIgnoreCase("Teacher")) {
+                    // Generate teacherId
+                    String teacherId = "TCH-" + UUID.randomUUID().toString().substring(0, 8);
 
-                Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+                    // Create teacher object
+                    newUser  = new Teacher(userID, teacherId, firstName, lastName, email, password, selectedRole, schoolCode);
+                } else if (selectedRole.equalsIgnoreCase("Parent")) {
+                    // Generate parentId
+                    String parentId = "TCH-" + UUID.randomUUID().toString().substring(0, 8);
 
-                // Navigate to login screen after registration
-                Intent intent = new Intent(RegisterActivity.this, SignInActivity.class);
-                startActivity(intent);
-                finish();
+                    // Create Parent object
+                    newUser  = new Parent(userID, parentId, firstName, lastName, email, password, selectedRole, schoolCode);
+                } else if (selectedRole.equalsIgnoreCase("Student")) {
+                    // Generate parentId
+                    String studentId = "TCH-" + UUID.randomUUID().toString().substring(0, 8);
+
+                    // Create Parent object
+                    newUser  = new Student(userID, studentId, firstName, lastName, email, password, selectedRole, schoolCode);
+                }
+
+                if(newUser != null) {
+                    // Call the correct method based on the type of newUser
+                    if (newUser instanceof Teacher) {
+                        dbHelper.addUser((Teacher) newUser);
+                    } else if (newUser instanceof Parent) {
+                        dbHelper.addUser((Parent) newUser);
+                    } else if (newUser instanceof Student) {
+                        dbHelper.addUser((Student) newUser);
+                    }
+
+
+                    Toast.makeText(RegisterActivity.this, "Registration Successful", Toast.LENGTH_SHORT).show();
+
+                    // Navigate to login screen after registration
+                    Intent intent = new Intent(RegisterActivity.this, SignInActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
             } catch (Exception e) {
                 Log.e("RegisterActivity", "Error adding user to database", e);
                 Toast.makeText(RegisterActivity.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();

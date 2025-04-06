@@ -1,20 +1,16 @@
 package com.example.ics449app;
 
 public class Student extends User {
-    private String schoolCode;
     private boolean isLocked;
+    private String studentId;
 
-    public Student(String userID, String firstName, String lastName, String email, String password, String role, String schoolCode) {
-        super(userID, firstName, lastName, email, password, role);
-        this.schoolCode=schoolCode;
+    public Student(String userID, String studentId, String firstName, String lastName, String email, String password, String role, String schoolCode) {
+        super(userID, firstName, lastName, email, password, role, schoolCode);
+        this.studentId = studentId;
     }
-
-    public String getSchoolCode() {
-        return schoolCode;
-    }
-
-    public void setSchoolCode(String schoolCode) {
-        schoolCode = schoolCode;
+    public Student(String studentId, String firstName, String lastName, String email, String password, String role, String schoolCode) {
+        super(studentId, firstName, lastName, email, password, role, schoolCode);
+        this.studentId = studentId;
     }
 
     public boolean isLocked() {
@@ -23,5 +19,13 @@ public class Student extends User {
 
     public void setisLocked(boolean isLocked) {
         this.isLocked = isLocked;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId() {
+        this.studentId = studentId;
     }
 }
