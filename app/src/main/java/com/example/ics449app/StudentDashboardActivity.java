@@ -6,14 +6,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 public class StudentDashboardActivity extends AppCompatActivity {
     private TextView tvTimer, tvWelcome;
     private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private long timeLeftInMillis = 60000; // 1 minute
+    private long timeLeftInMillis = 0;
+
+    private NumberPicker npHour, npMinute, npSecond;
     private SQLiteHelper dbHelper;
 
     @Override
@@ -24,21 +28,33 @@ public class StudentDashboardActivity extends AppCompatActivity {
         dbHelper = SQLiteHelper.instanceOfDatabase(this);
 
         tvTimer = findViewById(R.id.tvTimer);
-        tvWelcome = findViewById(R.id.tvWelcome); // Reference welcome text
-
+        tvWelcome = findViewById(R.id.tvWelcome);
         Button btnStartStudy = findViewById(R.id.btnStartStudy);
         Button btnStopReset = findViewById(R.id.btnStopReset);
         Button btnLogout = findViewById(R.id.btnLogout);
 
-        updateTimerDisplay();
+        // NumberPickers
+        npHour = findViewById(R.id.npHour);
+        npMinute = findViewById(R.id.npMinute);
+        npSecond = findViewById(R.id.npSecond);
 
+        npHour.setMinValue(0);
+        npHour.setMaxValue(23);
+        npMinute.setMinValue(0);
+        npMinute.setMaxValue(59);
+        npSecond.setMinValue(0);
+        npSecond.setMaxValue(59);
+
+        // Welcome message
+        String email = getIntent().getStringExtra("email");
+        setWelcomeMessage(email);
+
+        // Buttons
         btnStartStudy.setOnClickListener(v -> startStudyTimer());
         btnStopReset.setOnClickListener(v -> stopAndResetTimer());
         btnLogout.setOnClickListener(v -> logoutUser());
 
-        // Get email passed from SignInActivity
-        String email = getIntent().getStringExtra("email");
-        setWelcomeMessage(email);  //  Call function to show name
+        updateTimerDisplay();
     }
 
     private void setWelcomeMessage(String email) {
@@ -57,6 +73,17 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
     private void startStudyTimer() {
         if (!isTimerRunning) {
+            // Get time from NumberPickers
+            int hours = npHour.getValue();
+            int minutes = npMinute.getValue();
+            int seconds = npSecond.getValue();
+            timeLeftInMillis = (hours * 3600 + minutes * 60 + seconds) * 1000L;
+
+            if (timeLeftInMillis == 0) {
+                tvTimer.setText("00:00:00");
+                return;
+            }
+
             countDownTimer = new CountDownTimer(timeLeftInMillis, 1000) {
                 @Override
                 public void onTick(long millisUntilFinished) {
@@ -66,8 +93,8 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
                 @Override
                 public void onFinish() {
-                    tvTimer.setText(getString(R.string.timer_done));
                     isTimerRunning = false;
+                    tvTimer.setText("Done!");
                 }
             }.start();
             isTimerRunning = true;
@@ -79,13 +106,22 @@ public class StudentDashboardActivity extends AppCompatActivity {
             countDownTimer.cancel();
             isTimerRunning = false;
         }
-        timeLeftInMillis = 60000;
+
+        // Reset values
+        npHour.setValue(0);
+        npMinute.setValue(0);
+        npSecond.setValue(0);
+        timeLeftInMillis = 0;
         updateTimerDisplay();
     }
 
     private void updateTimerDisplay() {
-        int seconds = (int) (timeLeftInMillis / 1000);
-        tvTimer.setText(getString(R.string.timer_format, seconds));
+        int hours = (int) (timeLeftInMillis / 1000) / 3600;
+        int minutes = (int) ((timeLeftInMillis / 1000) % 3600) / 60;
+        int seconds = (int) (timeLeftInMillis / 1000) % 60;
+
+        String timeFormatted = String.format("%02d:%02d:%02d", hours, minutes, seconds);
+        tvTimer.setText(timeFormatted);
     }
 
     private void logoutUser() {
