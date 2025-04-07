@@ -29,8 +29,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private String teacherSchoolCode;
     private Button btnAddStudent, btnLockStudent;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,22 +45,22 @@ public class TeacherDashboardActivity extends AppCompatActivity {
 
         dbHelper = SQLiteHelper.instanceOfDatabase(this);
 
-        // Get the teacher's school code form intent or session
+        // Show welcome message
+        TextView tvWelcome = findViewById(R.id.tvWelcomeTeacher);
         Intent intent = getIntent();
-        teacherSchoolCode = intent.getStringExtra("schoolCode");    // Passed from login
+        String email = intent.getStringExtra("email");
+        teacherSchoolCode = intent.getStringExtra("schoolCode");
 
-        // Load students from the same school
+        String firstName = dbHelper.getFirstNameByEmail(email);  // You already have this method
+        tvWelcome.setText("Welcome, " + firstName);
+
         loadStudents();
 
-        // Initialize adapter for selected students grid
         selectedStudentsAdapter = new StudentGridAdapter(this, selectedStudents);
         selectedStudentsGrid.setAdapter(selectedStudentsAdapter);
 
-        // Handle student selection
         studentListView.setOnItemClickListener((parent, view, position, id) -> {
-            // Get student from filter list
             String selectedName = (String) parent.getItemAtPosition(position);
-
             for (Student student : students) {
                 String fullName = student.getFirstName() + " " + student.getLastName();
                 if (fullName.equals(selectedName)) {
@@ -76,9 +74,8 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Add student button on click
         btnAddStudent.setOnClickListener(v -> {
-            if(!selectedStudents.isEmpty()) {
+            if (!selectedStudents.isEmpty()) {
                 for (Student selectedStudent : selectedStudents) {
                     boolean added = dbHelper.addStudentToClass(selectedStudent.getEmail(), teacherSchoolCode);
                     if (added) {
@@ -87,7 +84,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                         Toast.makeText(this, "Failed to add student.", Toast.LENGTH_SHORT).show();
                     }
                 }
-                // Clear selected students after adding
                 selectedStudents.clear();
                 selectedStudentsAdapter.notifyDataSetChanged();
             } else {
@@ -95,30 +91,19 @@ public class TeacherDashboardActivity extends AppCompatActivity {
             }
         });
 
-        // Search student
         searchStudent.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                if(newText.isEmpty()) {
-                    studentListView.setVisibility(View.GONE);   // Hide list when search is empty
-                } else {
-                    studentListView.setVisibility(View.VISIBLE);    // Hide list if search is empty
-                    studentAdapter.getFilter().filter(newText);
-                }
-                selectedStudentsAdapter.notifyDataSetChanged(); // Update grid after search
+            @Override public boolean onQueryTextSubmit(String query) { return false; }
+            @Override public boolean onQueryTextChange(String newText) {
+                studentListView.setVisibility(newText.isEmpty() ? View.GONE : View.VISIBLE);
+                studentAdapter.getFilter().filter(newText);
+                selectedStudentsAdapter.notifyDataSetChanged();
                 return false;
             }
         });
 
-        // Lock Student button on click
         btnLockStudent.setOnClickListener(v -> {
-            if(!selectedStudents.isEmpty()) {
-                for(Student student : selectedStudents) {
+            if (!selectedStudents.isEmpty()) {
+                for (Student student : selectedStudents) {
                     sendLockCommandToStudent(student.getEmail());
                 }
                 Toast.makeText(this, "Selected students locked!", Toast.LENGTH_SHORT).show();
@@ -126,22 +111,16 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                 Toast.makeText(this, "Please select student.", Toast.LENGTH_SHORT).show();
             }
         });
-
-        btnLogout.setOnClickListener(v -> logoutUser());
     }
 
     private void loadStudents() {
-        students = dbHelper.getStudentsBySchool(teacherSchoolCode);  // Initialize class varible
-        List<String> studentNames = new ArrayList<>();  // Create a new list for student names
-
+        students = dbHelper.getStudentsBySchool(teacherSchoolCode);
+        List<String> studentNames = new ArrayList<>();
         for (Student student : students) {
             studentNames.add(student.getFirstName() + " " + student.getLastName());
         }
-
         studentAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, studentNames);
         studentListView.setAdapter(studentAdapter);
-
-        // Hide student List initially
         studentListView.setVisibility(View.GONE);
     }
 
@@ -152,8 +131,7 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     }
 
     public void sendLockCommandToStudent(String studentEmail) {
-
+        // Placeholder
     }
-
 }
 
