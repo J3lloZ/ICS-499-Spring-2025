@@ -409,4 +409,25 @@ public class SQLiteHelper extends SQLiteOpenHelper {
         }
         return false;   // Return false if any query fails or if column index is invalid
     }
+
+    public String getFirstNameByEmail(String email) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        String firstName = "";
+
+        try {
+            String query = "SELECT firstName FROM users WHERE LOWER(email) = LOWER(?)";
+            cursor = db.rawQuery(query, new String[]{email});
+            if (cursor.moveToFirst()) {
+                firstName = cursor.getString(0);
+            }
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error fetching first name by email", e);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        return firstName;
+   }
 }

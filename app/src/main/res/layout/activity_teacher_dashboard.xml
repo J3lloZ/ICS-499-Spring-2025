@@ -31,22 +31,32 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Welcome Message -->
+    <TextView
+        android:id="@+id/tvWelcomeTeacher"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome!"
+        android:textSize="18sp"
+        android:layout_marginTop="8dp"
+        android:textStyle="italic"
+        app:layout_constraintTop_toBottomOf="@id/teacherDashboardTitle"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Search View -->
     <SearchView
         android:id="@+id/searchStudent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:queryHint="Search Student..."
-        app:layout_constraintTop_toBottomOf="@id/teacherDashboardTitle"
+        app:layout_constraintTop_toBottomOf="@id/tvWelcomeTeacher"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:iconifiedByDefault="true"
-        />
-
+        android:iconifiedByDefault="true" />
 
     <!-- Student ListView -->
     <ListView
-
         android:id="@+id/studentListView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -98,5 +108,4 @@
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
 
