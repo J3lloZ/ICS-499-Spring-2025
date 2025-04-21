@@ -9,6 +9,6 @@
         <item>Teacher</item>
     </string-array>
     <string name="teacher_dashboard">Teacher Dashboard</string>
-
-
+    <string name="device_admin">Device Administrator</string>
+    <string name="device_admin_description">This app requires device administrator privileges to perform actions like locking the screen, wiping data, etc.</string>
 </resources>
