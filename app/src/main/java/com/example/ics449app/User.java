@@ -21,6 +21,9 @@ public abstract class User {
         this.schoolCode = schoolCode;
     }
 
+    public User(String studentID, String firstName, String lastName) {
+    }
+
     // Getters and Setters
     public String getUserID() {
         return userID;

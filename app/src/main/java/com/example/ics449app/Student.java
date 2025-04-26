@@ -13,6 +13,11 @@ public class Student extends User {
         this.studentId = studentId;
     }
 
+    public Student(String studentID, String firstName, String lastName) {
+        super(studentID, firstName, lastName);
+        this.studentId = studentID;
+    }
+
     public boolean isLocked() {
         return isLocked;
     }

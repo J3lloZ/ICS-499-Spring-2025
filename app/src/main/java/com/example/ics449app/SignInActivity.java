@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -51,9 +52,28 @@ public class SignInActivity extends AppCompatActivity {
                         intent = new Intent(SignInActivity.this, ParentDashboardActivity.class);
                         intent.putExtra("email", email);
                     } else if ("teacher".equalsIgnoreCase(role)) {
-                        intent = new Intent(SignInActivity.this, TeacherDashboardActivity.class);
-                        intent.putExtra("email", email);
-                        intent.putExtra("schoolCode", schoolCode);
+                        // Get teacher ID from teacher table using email
+                        Cursor teacherCursor = readableDb.rawQuery(
+                                "SELECT t.TeacherID From Teacher t " +
+                                        "JOIN Users u ON t.userID = u.userID " +
+                                        "WHERE LOWER(u.email) = LOWER(?)",
+                                new String[]{email}
+                        );
+
+                        if (teacherCursor.moveToFirst())    {
+                            String teacherId = teacherCursor.getString(0);
+
+                            intent = new Intent(SignInActivity.this, TeacherDashboardActivity.class);
+                            intent.putExtra("teacherId", teacherId);
+                            intent.putExtra("email", email);
+                            intent.putExtra("schoolCode", schoolCode);
+
+                            teacherCursor.close();
+                        } else {
+                            teacherCursor.close();
+                            Toast.makeText(this, "Teacher ID not found.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                     } else {
                         Toast.makeText(this, "Unknown role: " + role, Toast.LENGTH_SHORT).show();
                         return;

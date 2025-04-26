@@ -371,44 +371,77 @@ public class SQLiteHelper extends SQLiteOpenHelper {
 
     public boolean addStudentToClass(String email, String teacherSchoolCode) {
         SQLiteDatabase db = this.getWritableDatabase();
+        Cursor studentCursor = null;
+        Cursor teacherCursor = null;
 
-        // Get student ID by email
-        String studentIdQuery = "SELECT StudentID FROM Student Where email = ?";
-        Cursor cursor = db.rawQuery(studentIdQuery, new String[] {email});
+        try {
+            // Get student ID by email
+            String studentIdQuery = "SELECT s.StudentID FROM Student s " +
+                                    "JOIN Users u ON s.userID = u.userID " +
+                                    "Where u.email = ?";
+            studentCursor = db.rawQuery(studentIdQuery, new String[] {email});
 
-        if (cursor.moveToFirst()) {
-            int studentIdColumnIndex = cursor.getColumnIndex("StudentID");
-
-            // Ensure column index is valid
-            if (studentIdColumnIndex >= 0) {
-                String studentId = cursor.getString(studentIdColumnIndex);  // Safely access the student ID
-                cursor.close();
+            if (studentCursor.moveToFirst()) {
+                String studentId = studentCursor.getString(studentCursor.getColumnIndexOrThrow("StudentID"));
 
                 // Get teacher id by school code
-                String classIdQuery = "SELECT TeacherID FROM StudentClasses WHERE SchoolCode = ?";
-                cursor = db.rawQuery(classIdQuery, new String[]{teacherSchoolCode});
+                String classIdQuery = "SELECT TeacherID FROM Teacher WHERE SchoolCode = ?";
+                teacherCursor = db.rawQuery(classIdQuery, new String[]{teacherSchoolCode});
 
-                if (cursor.moveToFirst()) {
-                    int classIdColumnIndex = cursor.getColumnIndex("TeacherID");
+                if (teacherCursor.moveToFirst()) {
+                    String teacherId = teacherCursor.getString(teacherCursor.getColumnIndexOrThrow("TeacherID"));
 
-                    // Ensure column index is valid
-                    if (classIdColumnIndex >= 0) {
-                        String teacherID = cursor.getString(classIdColumnIndex);
-                        cursor.close();
+                    // Insert into student classes table to link student with teacher
+                    ContentValues values = new ContentValues();
+                    values.put("StudentID", studentId);
+                    values.put("TeacherID", teacherId);
 
-                        // Insert into student classes table to link student with teacher
-                        ContentValues values = new ContentValues();
-                        values.put("StudentID", studentId);
-                        values.put("TeacherID", teacherSchoolCode);
-
-                        long result = db.insert("StudentClasses", null, values);
-                        return result != -1;    // Return true if insertion was successful
-                    }
+                    long result = db.insert("StudentClasses", null, values);
+                    return result != -1;    // Return true if insertion was successful
                 }
             }
+        } catch (Exception e) {
+            Log.e("SQLiteHelper", "Error adding student to class", e);
+        }finally {
+            if (studentCursor != null) studentCursor.close();
+            if (teacherCursor != null) teacherCursor.close();
+            db.close();
         }
         return false;   // Return false if any query fails or if column index is invalid
     }
+
+    public List<Student> getStudentsByTeacher(String teacherID){
+        if (teacherID == null || teacherID.isEmpty()) {
+            throw new IllegalArgumentException("TeacherID cannot be null or empty");
+        }
+
+        List<Student> students = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "SELECT s.StudentID, s.FirstName, s.LastName " +
+                "FROM Student s " +
+                "JOIN StudentClasses sc ON s.StudentID = sc.StudentID " +
+                "JOIN Users u ON s.userID = u.userID " +
+                "WHERE sc.TeacherID = ?";
+
+        Cursor cursor = db.rawQuery(query, new String[]{teacherID});
+
+        if (cursor.moveToFirst())   {
+            do {
+                String studentId = cursor.getString(cursor.getColumnIndexOrThrow("StudentID"));
+                String firstName = cursor.getString(cursor.getColumnIndexOrThrow("FirstName"));
+                String lastName = cursor.getString(cursor.getColumnIndexOrThrow("LastName"));
+
+                Student student = new Student(studentId, firstName, lastName);
+                students.add(student);
+            } while (cursor.moveToNext());
+        } else {
+            Log.d("SQLite", "No students found for teacher: " + teacherID);
+        }
+        cursor.close();
+        return students;
+    }
+
 
     public String getFirstNameByEmail(String email) {
         SQLiteDatabase db = this.getReadableDatabase();

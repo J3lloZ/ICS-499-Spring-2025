@@ -27,28 +27,41 @@ public class TeacherDashboardActivity extends AppCompatActivity {
     private List<Student> selectedStudents = new ArrayList<>();
     private StudentGridAdapter selectedStudentsAdapter;
     private String teacherSchoolCode;
-    private Button btnAddStudent, btnLockStudent;
+    private Button btnAddStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teacher_dashboard);
 
+
+        Intent intent = getIntent();
+        String teacherId = intent.getStringExtra("teacherId");
+        String email = intent.getStringExtra("email");
+
+        // Initialize DB and UI elements
+        dbHelper = SQLiteHelper.instanceOfDatabase(this);
+
         Button btnLogout = findViewById(R.id.btnLogout);
         btnLogout.setOnClickListener(v -> logoutUser());
+
+        Button btnViewStudents = findViewById(R.id.btnViewStudents);
+        btnViewStudents.setOnClickListener(v -> {
+            Intent viewIntent = new Intent(TeacherDashboardActivity.this, ViewStudentsActivity.class);
+            viewIntent.putExtra("teacherId", teacherId);
+            startActivity(viewIntent);
+        });
 
         btnAddStudent = findViewById(R.id.btnAddStudent);
         searchStudent = findViewById(R.id.searchStudent);
         studentListView = findViewById(R.id.studentListView);
         selectedStudentsGrid = findViewById(R.id.selectedStudentsGrid);
-        btnLockStudent = findViewById(R.id.btnLockStudent);
+
 
         dbHelper = SQLiteHelper.instanceOfDatabase(this);
 
         // Show welcome message
         TextView tvWelcome = findViewById(R.id.tvWelcomeTeacher);
-        Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
         teacherSchoolCode = intent.getStringExtra("schoolCode");
 
         String firstName = dbHelper.getFirstNameByEmail(email);  // You already have this method
@@ -100,17 +113,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-        btnLockStudent.setOnClickListener(v -> {
-            if (!selectedStudents.isEmpty()) {
-                for (Student student : selectedStudents) {
-                    sendLockCommandToStudent(student.getEmail());
-                }
-                Toast.makeText(this, "Selected students locked!", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, "Please select student.", Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
     private void loadStudents() {
@@ -128,10 +130,6 @@ public class TeacherDashboardActivity extends AppCompatActivity {
         Intent intent = new Intent(TeacherDashboardActivity.this, SignInActivity.class);
         startActivity(intent);
         finish();
-    }
-
-    public void sendLockCommandToStudent(String studentEmail) {
-        // Placeholder
     }
 }
 
