@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "104129656121",
+    "project_id": "ics-449-spring-2025-app",
+    "storage_bucket": "ics-449-spring-2025-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:104129656121:android:4b6cb49261dd0b1897e4e8",
+        "android_client_info": {
+          "package_name": "com.example.ics449app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC83_Pn4FwxLwcjGfLXi_MmjmJbP8ofsm0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
