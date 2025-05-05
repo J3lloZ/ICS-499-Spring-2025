@@ -1,14 +1,17 @@
 package com.example.ics449app;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.View;
 import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class StudentDashboardActivity extends AppCompatActivity {
@@ -19,6 +22,8 @@ public class StudentDashboardActivity extends AppCompatActivity {
 
     private NumberPicker npHour, npMinute, npSecond;
     private SQLiteHelper dbHelper;
+    private DeviceAdminHelper mDeviceAdminHelper;
+    private OnBackPressedCallback backPressedCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +42,9 @@ public class StudentDashboardActivity extends AppCompatActivity {
         npHour = findViewById(R.id.npHour);
         npMinute = findViewById(R.id.npMinute);
         npSecond = findViewById(R.id.npSecond);
+
+        //DeviceAdminHelper
+        mDeviceAdminHelper = new DeviceAdminHelper(this);
 
         npHour.setMinValue(0);
         npHour.setMaxValue(23);
@@ -79,6 +87,9 @@ public class StudentDashboardActivity extends AppCompatActivity {
             int seconds = npSecond.getValue();
             timeLeftInMillis = (hours * 3600 + minutes * 60 + seconds) * 1000L;
 
+            mDeviceAdminHelper.startLockTask(this);
+            applyRestrictions();
+
             if (timeLeftInMillis == 0) {
                 tvTimer.setText("00:00:00");
                 return;
@@ -95,6 +106,9 @@ public class StudentDashboardActivity extends AppCompatActivity {
                 public void onFinish() {
                     isTimerRunning = false;
                     tvTimer.setText("Done!");
+
+                    removeRestrictions();
+                    mDeviceAdminHelper.stopLockTask(StudentDashboardActivity.this);
                 }
             }.start();
             isTimerRunning = true;
@@ -113,6 +127,8 @@ public class StudentDashboardActivity extends AppCompatActivity {
         npSecond.setValue(0);
         timeLeftInMillis = 0;
         updateTimerDisplay();
+        mDeviceAdminHelper.stopLockTask(StudentDashboardActivity.this);
+
     }
 
     private void updateTimerDisplay() {
@@ -125,9 +141,44 @@ public class StudentDashboardActivity extends AppCompatActivity {
     }
 
     private void logoutUser() {
-        Intent intent = new Intent(StudentDashboardActivity.this, SignInActivity.class);
-        startActivity(intent);
-        finish();
+        if(!isTimerRunning) {
+            Intent intent = new Intent(StudentDashboardActivity.this, SignInActivity.class);
+            startActivity(intent);
+            finish();
+        }
     }
+    private void applyRestrictions() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+
+        backPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // Disabled
+            }
+        };
+        getOnBackPressedDispatcher().addCallback(this, backPressedCallback);
+    }
+
+    private void removeRestrictions() {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE);
+        if (backPressedCallback != null) {
+            backPressedCallback.remove();
+        }
+    }
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // If the timer is running, reset it
+        if (isTimerRunning) {
+            stopAndResetTimer();
+            removeRestrictions();
+            mDeviceAdminHelper.stopLockTask(this);
+        }
+    }
+
 }
+
 
