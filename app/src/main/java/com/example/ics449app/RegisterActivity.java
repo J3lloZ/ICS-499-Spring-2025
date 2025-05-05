@@ -61,25 +61,11 @@ public class RegisterActivity extends AppCompatActivity {
             User newUser = null;
 
             try {
-                if(selectedRole.equalsIgnoreCase("Teacher")) {
-                    // Generate teacherId
-                    String teacherId = "TCH-" + UUID.randomUUID().toString().substring(0, 8);
-
-                    // Create teacher object
-                    newUser  = new Teacher(userID, teacherId, firstName, lastName, email, password, selectedRole, schoolCode);
-                } else if (selectedRole.equalsIgnoreCase("Parent")) {
-                    // Generate parentId
-                    String parentId = "TCH-" + UUID.randomUUID().toString().substring(0, 8);
-
-                    // Create Parent object
-                    newUser  = new Parent(userID, parentId, firstName, lastName, email, password, selectedRole, schoolCode);
-                } else if (selectedRole.equalsIgnoreCase("Student")) {
                     // Generate parentId
                     String studentId = "TCH-" + UUID.randomUUID().toString().substring(0, 8);
 
                     // Create Parent object
                     newUser  = new Student(userID, studentId, firstName, lastName, email, password, selectedRole, schoolCode);
-                }
 
                 if(newUser != null) {
                     // Call the correct method based on the type of newUser

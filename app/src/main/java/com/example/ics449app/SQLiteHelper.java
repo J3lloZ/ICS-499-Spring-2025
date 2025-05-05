@@ -30,7 +30,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // School table
-        String createSchoolsTable = "CREATE TABLE Schools (" +
+        /*String createSchoolsTable = "CREATE TABLE Schools (" +
                 "SchoolCode VARCHAR(255) PRIMARY KEY, " +
                 "name VARCHAR(255) NOT NULL, " +
                 "address VARCHAR(255), " +
@@ -110,7 +110,7 @@ public class SQLiteHelper extends SQLiteOpenHelper {
                 + "PRIMARY KEY (StudentID, teacherID), "
                 + "FOREIGN KEY (StudentID) REFERENCES Users(userID), "
                 + "FOREIGN KEY (teacherID) REFERENCES Users(userID));";
-        db.execSQL(createStudentClassesTable);
+        db.execSQL(createStudentClassesTable);*/
     }
 
     @Override
