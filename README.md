@@ -43,6 +43,7 @@ Coming soon...
 - Yod N Xiong - [GitHub](https://github.com/J3lloZ)
 
 ## 📂 Folder Structure
+```
 app/
 ├── java/com/example/ics449app/
 │ ├── DashboardActivity.java # Main dashboard with timer + lock
@@ -54,4 +55,4 @@ app/
 │ └── dashboard_activity.xml # UI for main dashboard
 │ └── register_activity.xml # UI for registration screen
 └── google-services.json # Firebase config
-
+```
