@@ -10,9 +10,6 @@ A productivity Android app designed for students who want to improve focus by li
 - **Firebase Integration**: Stores user information securely in Firestore and supports login/logout.
 - **Welcome Message**: Personalized welcome message based on your registered first name.
 
-## Screenshots
-
-Coming soon...
 
 ## Tech Stack
 
