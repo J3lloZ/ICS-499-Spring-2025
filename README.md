@@ -55,10 +55,12 @@ app/
 │ └── dashboard_activity.xml # UI for main dashboard
 │ └── register_activity.xml # UI for registration screen
 └── google-services.json # Firebase config
+```
 
-Installation & Setup (User Manual)
 
-System Requirements
+## Installation & Setup (User Manual)
+
+**System Requirements**
 
 Android Studio (Electric Eel or higher)
 
@@ -68,7 +70,7 @@ Java 11 SDK
 
 Firebase account
 
-Step-by-Step Installation
+**Step-by-Step Installation**
 
 Clone the Repo:
 
@@ -85,16 +87,16 @@ Download google-services.json and place it inside:
 
 app/google-services.json
 
-Enable Firebase Features:
+**Enable Firebase Features:**
 
 Firestore Database (in test mode)
 
 Email/Password authentication
 
-Build & Run the App:
+**Build & Run the App:**
 
 ./gradlew clean build installDebug
 
 Or simply run from Android Studio.
 
-```
+
