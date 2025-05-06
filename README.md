@@ -1,4 +1,4 @@
-# FocusLock App
+# Study + App
 
 A productivity Android app designed for students who want to improve focus by limiting distractions during study time. Built as a capstone project for ICS 499 - Software Engineering, Spring 2025.
 
