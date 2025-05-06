@@ -55,4 +55,46 @@ app/
 │ └── dashboard_activity.xml # UI for main dashboard
 │ └── register_activity.xml # UI for registration screen
 └── google-services.json # Firebase config
+
+Installation & Setup (User Manual)
+
+System Requirements
+
+Android Studio (Electric Eel or higher)
+
+Android Emulator or physical device (API 31+)
+
+Java 11 SDK
+
+Firebase account
+
+Step-by-Step Installation
+
+Clone the Repo:
+
+git clone https://github.com/J3lloZ/ICS-499-Spring-2025.git
+cd ICS-499-Spring-2025
+
+Firebase Setup:
+
+Create a Firebase project at https://console.firebase.google.com/
+
+Add Android app with your app's package name com.example.ics449app
+
+Download google-services.json and place it inside:
+
+app/google-services.json
+
+Enable Firebase Features:
+
+Firestore Database (in test mode)
+
+Email/Password authentication
+
+Build & Run the App:
+
+./gradlew clean build installDebug
+
+Or simply run from Android Studio.
+
 ```
