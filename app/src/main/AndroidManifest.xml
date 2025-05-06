@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -14,30 +13,21 @@
         android:theme="@style/Theme.ICS449App"
         tools:targetApi="31">
 
-        <!-- Sign In & Registration Activities -->
-        <activity android:name=".MainActivityHome" android:exported="true">
+        <!-- SignIn (Launcher) -->
+        <activity android:name=".SignInActivity" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
-        <!-- SignIn -->
-        <activity android:name=".SignInActivity" android:exported="true" />
-
         <!-- Register -->
         <activity android:name=".RegisterActivity" android:exported="true" />
 
-        <!-- Student & Parent Dashboards -->
-        <activity android:name=".StudentDashboardActivity" android:exported="true" />
-        <activity android:name=".ParentDashboardActivity" android:exported="true" />
-        <activity android:name=".TeacherDashboardActivity" android:exported="true" />
-
-        <!-- View Students -->
-        <activity android:name=".ViewStudentsActivity" android:exported="true" />
-
-        <!-- Old Dashboard (Remove if not needed) -->
+        <!-- Dashboard -->
         <activity android:name=".DashboardActivity" android:exported="false" />
+
+        <!-- Device Admin Receiver -->
         <receiver
             android:name="com.example.ics449app.MyDeviceAdminReceiver"
             android:exported="true"
